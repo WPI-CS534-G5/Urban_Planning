@@ -1,4 +1,3 @@
-
 #include "iofunctions.h"
 
 int readMap(vector<vector<int>> map,string name){
