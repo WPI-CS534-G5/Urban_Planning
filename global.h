@@ -1,5 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
+#include <vector>
+using std::vector;
 
 // ----- Global Definitions ----- //
 
@@ -21,3 +23,29 @@
 #define RANDOM      2
 
 #endif  //GLOBAL.H
+
+// Basic structure of a Gene
+struct individual{
+    //individual(const vector<int> &gene);
+    int fitness;
+    int iType;
+    long iPos;
+    vector<int> gene;
+};
+
+// Genetic Algorithm Structure
+struct Params{
+    int iNroIndustrialPlaces;
+    int iNroComercialPlaces;
+    int iNroResidencialPlaces;
+    int iSizeOfGene;
+    int iSizeOfPopulation;
+    int iSizeOfField;
+    int iNroIterations;
+    int iTime;
+    int iMethodSelection;
+    int iMethodCrossover;
+    int iMaxElitism;
+    int iMaxMutation;
+};
+
