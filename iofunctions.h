@@ -1,13 +1,15 @@
 #ifndef IOFUNCTIONS_H
 #define IOFUNCTIONS_H
-#include <vector>
+/*
+#include <c++/iostream>
 #include <string>
+#include <fstream>
 #include "global.h"
 
-using std::vector;
-using std::string;
 
-int printMap(vector<vector<int>> map);
-int readMap(vector<vector<int>> map,string name);
+
+
+int readMap(struct Params &params);
+int printMap(vector<vector<int>> map);*/
 
 #endif  //IOFUNCTIONS.H

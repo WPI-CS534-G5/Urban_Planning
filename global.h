@@ -28,7 +28,6 @@ using std::vector;
 struct individual{
     //individual(const vector<int> &gene);
     int fitness;
-    int iType;
     long iPos;
     vector<int> gene;
 };
@@ -41,11 +40,20 @@ struct Params{
     int iSizeOfGene;
     int iSizeOfPopulation;
     int iSizeOfField;
+    int iNroRowsField;
+    int iNroColField;
     int iNroIterations;
     int iTime;
     int iMethodSelection;
     int iMethodCrossover;
     int iMaxElitism;
     int iMaxMutation;
+    vector<int> Map;
+    vector<int> vTypes;
 };
 
+struct xyDato{
+    int name;
+    int x;
+    int y;
+};

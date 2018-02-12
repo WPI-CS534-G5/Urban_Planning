@@ -32,7 +32,7 @@ int initPopulation(struct Params GA_Params,vector<struct individual> &vPopulatio
     }
 
     // Calculate Fitness Function
-    if(evalFitnessPopulation(vPopulation)!=SUCCESS)
+    if(evalFitnessPopulation(GA_Params, vPopulation)!=SUCCESS)
     {
         cout<<"Error! Fitness Function failed!"<<endl;
         _Exit(EXIT_FAILURE);
@@ -43,7 +43,7 @@ int initPopulation(struct Params GA_Params,vector<struct individual> &vPopulatio
 }
 
 // Calculates the fitness of an individual
-int fitnessFnc(struct individual Individual)
+int fitnessFnc(struct Params GA_Params, struct individual nIndividual)
 {
     /// Change this code with the conditions of the homework
     long long int seed = std::chrono::steady_clock::now().time_since_epoch().count();
@@ -51,12 +51,70 @@ int fitnessFnc(struct individual Individual)
     return generator()%100;
 }
 
+void pos2xy(struct Params GA_Params, int iPos, struct xyDato &Dato){
+
+    Dato.y=(int)iPos/GA_Params.iNroColField;
+    Dato.x=iPos%GA_Params.iNroColField;
+}
+
+int fitnessFnc1(struct Params GA_Params, struct individual Individual) {
+    struct xyDato Dato;
+    struct xyDato Terrain;
+    int iValue = 0;
+    int Pos = 0;
+    int PosT = 0;
+    int j = 0;
+    int iDeltaX = 0;
+    int iDeltaY = 0;
+    int Distance = 0;
+
+    Individual.fitness = 0;
+    for (int n:Individual.gene) {
+        iValue = iValue + n;
+        Pos = iValue % GA_Params.iSizeOfField;
+        pos2xy(GA_Params, Pos, Dato);
+        //cout << "Type:" << GA_Params.vTypes[j] << "\tData: " << "X=" << Dato.x << " Y=" << Dato.y << endl;
+
+        for (int i = 0; i < GA_Params.Map.size(); i++) {
+            pos2xy(GA_Params, i, Terrain);
+            //cout << "TypeTerrain:" << GA_Params.Map[i] << "\tData: " << "X=" << Terrain.x << " Y=" << Terrain.y << endl;
+            if (GA_Params.Map[i] == TOXIC_SITE) {
+                iDeltaX = abs(Terrain.x - Dato.x);
+                iDeltaY = abs(Terrain.y - Dato.y);
+                Distance = iDeltaY + iDeltaX;
+
+                if (Distance <= 2) {
+                    if (GA_Params.vTypes[j] == COMMERCIAL)
+                        Individual.fitness = Individual.fitness + 20;
+                    if (GA_Params.vTypes[j] == INDUSTRIAL)
+                        Individual.fitness = Individual.fitness + 10;
+                    if (GA_Params.vTypes[j] == RESIDENTIAL)
+                        Individual.fitness = Individual.fitness + 20;
+                }
+            }
+            if(GA_Params.Map[i]==SCENIC_VIEW){
+                if(GA_Params.vTypes[j]==RESIDENTIAL){
+                    iDeltaX = abs(Terrain.x - Dato.x);
+                    iDeltaY = abs(Terrain.y - Dato.y);
+                    Distance = iDeltaY + iDeltaX;
+                    if(Distance<=2)
+                        Individual.fitness = Individual.fitness - 10;
+                }
+            }
+        }
+        j++;
+    }
+    return Individual.fitness;
+}
+
+
+
 // Calculates the fitness of all population
-int evalFitnessPopulation(vector<struct individual> &vPopulation){
+int evalFitnessPopulation(struct Params GA_Params, vector<struct individual> &vPopulation){
     if(vPopulation.size()==0)
         return FAILURE;
     for(struct individual &oneIndividual:vPopulation){
-        oneIndividual.fitness=fitnessFnc(oneIndividual);
+        oneIndividual.fitness=fitnessFnc1(GA_Params, oneIndividual);
     }
     return SUCCESS;
 }
@@ -109,7 +167,7 @@ struct individual evolvePopulation(struct Params GA_Params, vector<struct indivi
     }
 
     // Calculate Fitness Function
-    if(evalFitnessPopulation(vNewPopulation)!=SUCCESS)
+    if(evalFitnessPopulation(GA_Params, vNewPopulation)!=SUCCESS)
     {
         cout<<"Error! Fitness Function failed!"<<endl;
         _Exit(EXIT_FAILURE);
@@ -179,7 +237,7 @@ int genetic(int argc,char* argv[]){
 
 
     //Init the parameters of the Genetic Algorithm.
-    GA_Params.iSizeOfGene=4;
+    GA_Params.iSizeOfGene=3;
     GA_Params.iSizeOfPopulation=20;
     GA_Params.iMethodSelection=TOURNAMENT;
     GA_Params.iMethodCrossover=RANDOM;
@@ -187,7 +245,24 @@ int genetic(int argc,char* argv[]){
     GA_Params.iMaxMutation=MAX_MUTATION;
     GA_Params.iTime=1000; //milliseconds
     GA_Params.iNroIterations=300;
-    GA_Params.iSizeOfField=16;
+    GA_Params.iSizeOfField=12;
+    GA_Params.iNroColField=4;
+    GA_Params.iNroRowsField=3;
+    GA_Params.Map.push_back(13);
+    GA_Params.Map.push_back(9);
+    GA_Params.Map.push_back(5);
+    GA_Params.Map.push_back(9);
+    GA_Params.Map.push_back(2);
+    GA_Params.Map.push_back(2);
+    GA_Params.Map.push_back(3);
+    GA_Params.Map.push_back(3);
+    GA_Params.Map.push_back(1);
+    GA_Params.Map.push_back(4);
+    GA_Params.Map.push_back(4);
+    GA_Params.Map.push_back(4);
+    GA_Params.vTypes.push_back(COMMERCIAL);
+    GA_Params.vTypes.push_back(INDUSTRIAL);
+    GA_Params.vTypes.push_back(RESIDENTIAL);
 
     // Load parameters from the File
         ///Put that code here
@@ -199,6 +274,8 @@ int genetic(int argc,char* argv[]){
         _Exit(EXIT_FAILURE);
     }
     long iTime=0;
+
+    //fitnessFnc1(GA_Params,vPopulation[0]);
 
     while(iter<GA_Params.iNroIterations&&iTime<GA_Params.iTime){
         // Iterate with the next generations
