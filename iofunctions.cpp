@@ -1,44 +1,75 @@
+
 #include "iofunctions.h"
+/*
+using std::ifstream;
 
-int readMap(vector<vector<int>> map,string name){
+int readMap(struct Params &params){
 
-  // ifstream file(argv[2]);
-  // std::cout << "Urban Planning" << '\n';
-  // if (argc!= 2) {
-  // 	std::cout << "Wrong input, please run again !!!" << '\n';
-  // 	return EXIT_FAILURE;
-  // }
-  // int Algorithm;
-  // std::cout << " Menu:" << '\n';
-  // std::cout << "1-->Genetic Algorithm" << '\n';
-  // std::cout << "2-->Hill Climbing Algorithm" << '\n';
-  // std::cin >> Algorithm;
-  // if (Algorithm > 2||Algorithm<1) {
-  // 	std::cout << "Wrong input, you can either type 1 for a Genetic Algorithm approach, or 2 for Hill Climbing !!!" << '\n';
-  // 	return EXIT_FAILURE;
-  // }
-  //
-  //
-  // if (file.is_open()){
-  //   char c;
-  //
-  //   commercialBuildings = std::stoi file.get(c);
-  //   industrialBuildings = std::stoi file.get(c);
-  //   residentialBuildings = (int) file.get(c);
-  //   while ( getline (myfile,line)){
-  //     cout << line << '\n';
-  //   }
-  //   file.close();
-  // }else{
-  //   cout << "Unable to open file";
-  //   return 0;
-  // }
+    string line;
+    ifstream myfile (name);
+        if (myfile.is_open()){
 
+            getline (myfile,line);
+            params.iNroIndustrialPlaces = line.at(0) - '0';
 
-  return 1;
-}
+            getline (myfile,line);
+            params.iNroComercialPlaces = line.at(0) - '0';
+
+            getline (myfile,line);
+            params.iNroResidencialPlaces = line.at(0) - '0';
+
+            int rows = 0;
+            int columns = 0;
+            vector<vector<int>> Map;
+            while ( getline (myfile,line)){
+                columns = 0;
+                vector<int> row;
+                for (int i =0; i < line.length(); i++){
+                    if(line.at(i) == 'X'){
+                        row.push_back(TOXIC_SITE);
+                        columns++;
+                    }else if(line.at(i)=='S'){
+                        row.push_back(SCENIC_VIEW);
+                        columns++;
+                    }else if((line.at(i) - '0')>=0 && (line.at(i) - '0')<=9){
+                        row.push_back(line.at(i) - '0');
+                        columns++;
+                    }
+                }
+                Map.push_back(row);
+                rows++;
+            }
+
+            myfile.close();
+        }else{
+            cout << "Unable to open file"<< '\n';
+            return 0;
+        }
+
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<columns;j++){
+                params.Map.push_back(Map[i][j]);
+            }
+        }
+
+        params.iNroRowsField =rows;
+        params.iNroColField = columns;
+
+        return 1;
+    }
 
 int printMap(vector<vector<int>> map){
 
-  return 1;
+        cout << "MAP" << '\n';
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<columns;j++){
+                cout << Map[i][j]<<",";
+            }
+            cout << '\n';
+        }
+
+        return 1;
+
 }
+
+ */

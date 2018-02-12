@@ -19,12 +19,12 @@ int initPopulation(struct Params, vector<struct individual> &);
 /* fitnessFnc() : Calculate the fitness for one individual
  *  Input:  An individual
  *  Output: Fitness Value */
-int fitnessFnc(struct individual);
+int fitnessFnc(struct Params, struct individual);
 
 /* evalFitnessPopulation() : Apply the fitnessFnc over all the population
  *  Input:  A population
  *  Output: SUCCESS or FAIL */
-int evalFitnessPopulation(vector<struct individual> &);
+int evalFitnessPopulation(struct Params, vector<struct individual> &);
 
 /* evolvePopulation() : It generates a new generation using Elitism, Crossover and Mutation and calculate the Fitness
  *  Input:  A population
