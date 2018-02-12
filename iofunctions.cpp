@@ -2,10 +2,13 @@
 #include "iofunctions.h"
 
 
-int readMap(struct Params params){
+int readMap(struct Params &params){
 
   string line;
-  ifstream myfile (name);
+  ifstream myfile (params.file);
+  int rows = 0;
+  int columns = 0;
+  vector<vector<int>> Map;
   if (myfile.is_open()){
 
       getline (myfile,line);
@@ -17,13 +20,10 @@ int readMap(struct Params params){
       getline (myfile,line);
       params.iNroResidencialPlaces = line.at(0) - '0';
 
-      int rows = 0;
-      int columns = 0;
-      vector<vector<int>> Map;
     while ( getline (myfile,line)){
       columns = 0;
       vector<int> row;
-      for (int i =0; i < line.length(); i++){
+      for (int i =0; i < (int)line.length(); i++){
         if(line.at(i) == 'X'){
           row.push_back(TOXIC_SITE);
           columns++;
@@ -57,15 +57,36 @@ int readMap(struct Params params){
   return 1;
 }
 
-int printMap(vector<vector<int>> map){
+int printMap(struct Params &params){
 
+  int rows = params.iNroRowsField;
+  int columns = params.iNroColField;
+
+  cout << "Rows: " << params.iNroRowsField << '\n';
+  cout << "Columns: " << params.iNroColField << '\n';
   cout << "MAP" << '\n';
-  for(int i=0;i<rows;i++){
-    for(int j=0;j<columns;j++){
-      cout << Map[i][j]<<",";
-    }
-    cout << '\n';
+  for(int i=0;i<rows*columns;i++){
+      cout << params.Map[i]<<",";
   }
+  cout << '\n';
+  return 1;
+}
 
+
+int finalPrint(struct Params &params){
+
+  int rows = params.iNroRowsField;
+  int columns = params.iNroColField;
+
+  cout << "Rows: " << params.iNroRowsField << '\n';
+  cout << "Columns: " << params.iNroColField << '\n';
+  cout << "MAP" << '\n';
+
+  for(int i=0;i<rows*columns;i++){
+      cout << params.Map[i]<<",";
+      if ((i%columns == 0)&&(i!=0)){
+        cout << '\n';
+      }
+  }
   return 1;
 }
