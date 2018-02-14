@@ -28,31 +28,29 @@ using std::string;
 struct individual{
     //individual(const vector<int> &gene);
     int fitness;
-    int iType;
     long iPos;
     vector<int> gene;
 };
 
 // Genetic Algorithm Structure
 struct Params{
-  int iNroIndustrialPlaces;
-  int iNroComercialPlaces;
-  int iNroResidencialPlaces;
-  int iSizeOfGene;
-  int iSizeOfPopulation;
-  int iSizeOfField;
-  int iNroRowsField;
-  int iNroColField;
-  int iNroIterations;
-  int iTime;
-  int iMethodSelection;
-  int iMethodCrossover;
-  int iMaxElitism;
-  int iMaxMutation;
-  vector<int> Map;
-  vector<int> vTypes;
-  string file;
-
+    int iNroIndustrialPlaces;
+    int iNroComercialPlaces;
+    int iNroResidencialPlaces;
+    int iSizeOfGene;
+    int iSizeOfPopulation;
+    int iSizeOfField;
+    int iNroRowsField;
+    int iNroColField;
+    int iNroIterations;
+    int iTime;
+    int iMethodSelection;
+    int iMethodCrossover;
+    int iMaxElitism;
+    int iMaxMutation;
+    vector<int> Map;
+    vector<int> vTypes;
+    string file;
 };
 
 struct xyDato{

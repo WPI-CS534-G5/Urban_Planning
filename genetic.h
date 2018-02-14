@@ -1,8 +1,9 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 #include <vector>
-#include <iostream>
+#include <c++/iostream>
 #include "global.h"
+#include "iofunctions.h"
 
 using std::vector;
 using std::cout; using std::endl;
@@ -51,5 +52,5 @@ long getRandom(long);
 /* Only for debuggin purpuses */
 void showGene(struct individual Gene);
 void showPopulation(vector<struct individual> &vPopulation);
-int updateMap(struct individual Individual, struct Params &params);
+
 #endif//for GENETIC.H
