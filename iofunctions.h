@@ -16,5 +16,6 @@ using std::string;
 int readMap(struct Params &params);
 int printMap(struct Params &params);
 int finalPrint(struct Params &params);
+char convertNumToChar(int num);
 
 #endif  //IOFUNCTIONS.H
