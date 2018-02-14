@@ -48,8 +48,12 @@ int isAnIndividualValid(struct Params, struct individual nIndividual);
 long getRandom(long);
 
 
+int manhatanDistance(int pos1,int pos2,struct Params GA_Params);
+int updateMap(struct individual Individual, struct Params &params);
+int cleanMap(struct individual Individual, struct Params &params);
+
 /* Only for debuggin purpuses */
 void showGene(struct individual Gene);
 void showPopulation(vector<struct individual> &vPopulation);
-int updateMap(struct individual Individual, struct Params &params);
+
 #endif//for GENETIC.H

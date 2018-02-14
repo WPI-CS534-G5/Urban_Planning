@@ -50,15 +50,9 @@ struct Params{
   int iMaxElitism;
   int iMaxMutation;
   vector<int> Map;
+  vector<int> InitialMap;
   vector<int> vTypes;
   string file;
-
-};
-
-struct xyDato{
-    int name;
-    int x;
-    int y;
 };
 
 #endif  //GLOBAL.H

@@ -20,6 +20,8 @@ int readMap(struct Params &params){
       getline (myfile,line);
       params.iNroResidencialPlaces = line.at(0) - '0';
 
+      params.iSizeOfGene= params.iNroIndustrialPlaces+ params.iNroComercialPlaces+params.iNroResidencialPlaces;
+
     while ( getline (myfile,line)){
       columns = 0;
       vector<int> row;
@@ -48,11 +50,12 @@ int readMap(struct Params &params){
   for(int i=0;i<rows;i++){
     for(int j=0;j<columns;j++){
       params.Map.push_back(Map[i][j]);
+      params.InitialMap.push_back(Map[i][j]);
     }
   }
-
   params.iNroRowsField =rows;
   params.iNroColField = columns;
+  params.iSizeOfField = rows*columns;
 
   return 1;
 }
@@ -62,9 +65,7 @@ int printMap(struct Params &params){
   int rows = params.iNroRowsField;
   int columns = params.iNroColField;
 
-  cout << "Rows: " << params.iNroRowsField << '\n';
-  cout << "Columns: " << params.iNroColField << '\n';
-  cout << "MAP" << '\n';
+  cout << "Initial Map" << '\n';
   for(int i=0;i<rows*columns;i++){
       cout << params.Map[i]<<",";
   }
@@ -74,21 +75,70 @@ int printMap(struct Params &params){
 
 
 int finalPrint(struct Params &params){
-
   int rows = params.iNroRowsField;
   int columns = params.iNroColField;
-
-  cout << "Rows: " << params.iNroRowsField << '\n';
-  cout << "Columns: " << params.iNroColField << '\n';
-  cout << "MAP" << '\n';
-
+  cout << "--------- Resulting Map ---------" << '\n';
+  cout << "  ";
   for(int i=0;i<rows*columns;i++){
-      cout << params.Map[i]<<"|";
+      cout << convertNumToChar(params.Map[i])<<"|";
       if (((i+1)%columns == 0)&&(i!=0)){
         cout << '\n';
+        cout << "  ";
       }
   }
   cout << '\n';
-
   return 1;
+}
+
+char convertNumToChar(int num){
+  char character;
+  switch (num) {
+    case 10:
+      character = 'I';
+      break;
+    case 11:
+      character = 'C';
+      break;
+    case 12:
+      character = 'R';
+      break;
+    case 13:
+      character = 'X';
+      break;
+    case 14:
+      character = 'S';
+      break;
+    default:
+      character = ' ';
+      break;
+  }
+  return character;
+}
+
+
+int saveCSV_File(vector<struct individual> Data){
+    ofstream outputFile;
+    outputFile.open("fitness.txt");
+
+    for(int i=0;i<(int)Data.size();i++)
+    {
+        outputFile<<Data[i].fitness<<endl;
+    }
+    outputFile.flush();
+    outputFile.close();
+    cout<<"fitness.txt Generated!: Log of fitness"<<endl;
+
+    outputFile.open("behavior.txt");
+
+    for(int i=0;i<(int)Data.size();i++)
+    {
+        for(int j=0;j<(int)Data[i].gene.size();j++){
+            outputFile << Data[i].gene[j]<<" ";
+        }
+        outputFile<<endl;
+    }
+    outputFile.flush();
+    outputFile.close();
+    cout<<"behavior.txt Generated!: Log of iterations"<<endl;
+    return 1;
 }
