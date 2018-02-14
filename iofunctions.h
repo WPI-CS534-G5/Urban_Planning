@@ -1,21 +1,22 @@
-
-
 #ifndef IOFUNCTIONS_H
 #define IOFUNCTIONS_H
 
-#include "global.h"
-#include <iostream>
-#include <vector>
-#include <fstream>
+#include <c++/iostream>
 #include <string>
-using namespace std;
+#include <fstream>
+#include "global.h"
 
-using std::vector;
 using std::string;
+using std::ofstream;
+using std::ifstream;
+using std::cout;
+using std::endl;
 
-int readMap(struct Params &params);
-int printMap(struct Params &params);
-int finalPrint(struct Params &params);
-char convertNumToChar(int num);
 int saveCSV_File(vector<struct individual>);
+int readMap(struct Params &params);
+
+/*
+int readMap(struct Params &params);
+int printMap(vector<vector<int>> map);*/
+
 #endif  //IOFUNCTIONS.H

@@ -1,8 +1,9 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 #include <vector>
-#include <iostream>
+#include <c++/iostream>
 #include "global.h"
+#include "iofunctions.h"
 
 using std::vector;
 using std::cout; using std::endl;
@@ -47,10 +48,6 @@ int isAnIndividualValid(struct Params, struct individual nIndividual);
  *  Output: A random number between 0 and MAX_NUMBER */
 long getRandom(long);
 
-
-int manhatanDistance(int pos1,int pos2,struct Params GA_Params);
-int updateMap(struct individual Individual, struct Params &params);
-int cleanMap(struct individual Individual, struct Params &params);
 
 /* Only for debuggin purpuses */
 void showGene(struct individual Gene);

@@ -1,10 +1,8 @@
 
-#include <random>
-#include <chrono>
+#include <c++/random>
+#include <c++/chrono>
 #include <algorithm>
 #include "genetic.h"
-#include "iofunctions.h"
-#include <cmath>
 
 
 // Generates the total number of individuals with random genes
@@ -29,7 +27,7 @@ int initPopulation(struct Params GA_Params,vector<struct individual> &vPopulatio
             i--;
             //cout<<"Invalid individue detected"<<endl;
         }
-
+        //cout<<"SizeGene: "<<newIndividual.gene.size();
         newIndividual.gene.clear();
     }
 
@@ -44,102 +42,88 @@ int initPopulation(struct Params GA_Params,vector<struct individual> &vPopulatio
     return SUCCESS;
 }
 
+// Calculates the fitness of an individual
+int fitnessFnc(struct Params GA_Params, struct individual nIndividual)
+{
+    /// Change this code with the conditions of the homework
+    long long int seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::mt19937 generator (seed);
+    return generator()%100;
+}
 
+void pos2xy(struct Params GA_Params, int iPos, struct xyDato &Dato){
 
-  int costBuild(struct Params GA_Params,int i){
-    int score=0;
-    if(GA_Params.InitialMap[i]<10){
-      score -= GA_Params.InitialMap[i];
+    Dato.y=(int)iPos/GA_Params.iNroColField;
+    Dato.x=iPos%GA_Params.iNroColField;
+}
+
+int fitnessFnc1(struct Params GA_Params, struct individual Individual) {
+    struct xyDato Gene;
+    struct xyDato Terrain;
+    int iValue = 0;
+    int Pos = 0;
+    int PosT = 0;
+    int j = 0;
+    int iDeltaX = 0;
+    int iDeltaY = 0;
+    int Distance = 0;
+    /*
+    cout<<GA_Params.iNroRowsField<<endl;
+    cout<<GA_Params.iNroColField<<endl;
+    cout<<GA_Params.iSizeOfField<<endl;*/
+    //cout<<"Gene:"<<"["<<Individual.gene[0]<<" "<<Individual.gene[1]<<" "<<Individual.gene[2]<<"]"<<endl;
+    Individual.fitness = 0;
+    for (int n:Individual.gene) {
+        iValue = iValue + n;
+        Pos = iValue % GA_Params.iSizeOfField;
+        pos2xy(GA_Params, Pos, Gene);
+        if(GA_Params.Map[Pos]==SCENIC_VIEW)
+            GA_Params.Map[Pos]=0;
+
+        Individual.fitness=Individual.fitness-GA_Params.Map[Pos];
+        //cout << "Type:" << GA_Params.vTypes[j] << "\tData: " << "X=" << Gene.x << " Y=" << Gene.y << "Fitness:"<<GA_Params.Map[Pos]<<endl;
+
+        for (int i = 0; i < GA_Params.Map.size(); i++) {
+            pos2xy(GA_Params, i, Terrain);
+            if (GA_Params.Map[i] == TOXIC_SITE) {
+                //cout << "TypeTerrain:" << GA_Params.Map[i] << "\tData: " << "X=" << Terrain.x << " Y=" << Terrain.y << endl;
+                iDeltaX = abs(Terrain.x - Gene.x);
+                iDeltaY = abs(Terrain.y - Gene.y);
+                Distance = iDeltaY + iDeltaX;
+                //cout<<"Fitness:"<<Individual.fitness<<endl;
+                if (Distance <= 2) {
+                    //cout << "Type:" << GA_Params.vTypes[j] << "\tData: " << "X=" << Gene.x << " Y=" << Gene.y << "Fitness:"<<GA_Params.Map[Pos]<<endl;
+                    if (GA_Params.vTypes[j] == COMMERCIAL)
+                        Individual.fitness = Individual.fitness - 20;
+                    if (GA_Params.vTypes[j] == INDUSTRIAL)
+                        Individual.fitness = Individual.fitness - 10;
+                    if (GA_Params.vTypes[j] == RESIDENTIAL)
+                        Individual.fitness = Individual.fitness - 20;
+                }
+            }
+            if(GA_Params.Map[i]==SCENIC_VIEW){
+                if(GA_Params.vTypes[j]==RESIDENTIAL){
+                    iDeltaX = abs(Terrain.x - Gene.x);
+                    iDeltaY = abs(Terrain.y - Gene.y);
+                    Distance = iDeltaY + iDeltaX;
+                    if(Distance<=2||Distance>0)
+                        Individual.fitness = Individual.fitness + 10;
+                }
+            }
+        }
+        j++;
     }
-    return score;
-  }
+    //cout<<"FitnessFnc:"<<Individual.fitness<<endl;
+    return Individual.fitness;
+}
 
-  int fitBuild(struct Params GA_Params, int i,int building, int distance, int points){
-    int score=0;
-    for(int j=0;j< (int)GA_Params.Map.size();j++){
-      if((i!=j)&&(GA_Params.Map[j]==building)&&(manhatanDistance(i,j,GA_Params)<distance+1)){
-        score += points;
-      }
-    }
-    return score;
-  }
-
-  //Get the Manhatan Distance
-  int manhatanDistance(int pos1,int pos2,struct Params GA_Params){
-    return abs(((int)pos1/GA_Params.iNroColField)-((int)pos2/GA_Params.iNroColField))+abs((pos1%GA_Params.iNroColField)-(pos2%GA_Params.iNroColField));
-  }
-
-  int fitnessFnc(struct Params GA_Params, struct individual Individual) {
-
-    int fitness =0;
-
-    //cout << "oooooooooooooo" << '\n';
-    //updateMap(Individual,GA_Params);
-    //cout << "eeeeeeeeeeeeee" << '\n';
-    for(int i=0;i<(int) GA_Params.Map.size();i++){
-      switch (GA_Params.Map[i]) {
-        // Industrial buildings
-        case 10:
-          //Dificulty of building
-          fitness += costBuild(GA_Params,i);
-          // Industrial tiles benefit from being near other industry.
-          //For each industrial tile within 2, there is a bonus of 3 points.
-          fitness += fitBuild(GA_Params,i,10,2,3);
-          break;
-        case 11:
-          //Dificulty of building
-          fitness += costBuild(GA_Params,i);
-          // Commercial sites benefit from being near residential tiles.
-          // For each residential tile within 3 squares, there is a bonus of 5 points.
-          fitness += fitBuild(GA_Params,i,12,3,5);
-          // However, commercial sites do not like competition.
-          //For each commercial site with 2 squares, there is a penalty of 5 points.
-          fitness += fitBuild(GA_Params,i,11,2,-5);
-          break;
-        case 12:
-          cout << "R" << '\n';
-          //Dificulty of building
-          fitness += costBuild(GA_Params,i);
-          // Residential sites do not like being near industrial sites.
-          // For each industrial site within 3 squares there is a penalty of 5 points.
-          fitness += fitBuild(GA_Params,i,10,3,-5);
-          // However, for each commercial site with 3 squares there is a bonus of 5 points.
-          fitness += fitBuild(GA_Params,i,11,3,5);
-          break;
-        case 13:
-          // Former toxic waste site: Industrial zones within 2 tiles take a penalty of -10.
-          // Commercial and residential zones within 2 tiles take a penalty of -20.
-          fitness += fitBuild(GA_Params,i,10,2,-10);
-          fitness += fitBuild(GA_Params,i,11,2,-20);
-          fitness += fitBuild(GA_Params,i,12,2,-20);
-          break;
-        case 14:
-          // scenic view.  Residential zones within 2 tiles gain a bonus of 10 points.
-          fitness += fitBuild(GA_Params,i,12,2,10);
-          break;
-        default:
-          break;
-      }
-    }
-    //cleanMap(Individual,GA_Params);
-
-    return fitness;
-
-    //
-    // long long int seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    // std::mt19937 generator (seed);
-    // return generator()%100;
-
-  }
-
-
-  // Calculates the fitness of all population
+// Calculates the fitness of all population
 int evalFitnessPopulation(struct Params GA_Params, vector<struct individual> &vPopulation){
     if(vPopulation.size()==0)
         return FAILURE;
-    for(int i=0;i<(int)vPopulation.size();i++)
+    for(int i=0;i<vPopulation.size();i++)
     {
-        vPopulation[i].fitness=fitnessFnc(GA_Params, vPopulation[i]);
+        vPopulation[i].fitness=fitnessFnc1(GA_Params, vPopulation[i]);
         //cout<<vPopulation[i].fitness<<endl;
     }
     return SUCCESS;
@@ -255,13 +239,13 @@ struct individual getNewIndividualByCrossover(vector<struct individual> &vPopula
 }
 
 
-
 // Main function for the genetic algorithm
 int genetic(int argc,char* argv[]){
-  vector <struct individual> vPopulation;
-  vector <struct individual> finalPopulation;
+    vector <struct individual> vPopulation;
+    vector <struct individual> finalPopulation;
     struct Params GA_Params;
     struct individual iGoalReached;
+    struct individual iBestFitnessValue;
     long iter=0;
 
     //For measurement the time ellased
@@ -269,56 +253,67 @@ int genetic(int argc,char* argv[]){
 
 
     //Init the parameters of the Genetic Algorithm.
-    GA_Params.file = argv[1];
-    //GA_Params.iSizeOfGene=3;
-    GA_Params.iSizeOfPopulation=20;
+    GA_Params.file = argv[1];  //
+    GA_Params.iSizeOfPopulation=40;
     GA_Params.iMethodSelection=TOURNAMENT;
     GA_Params.iMethodCrossover=RANDOM;
     GA_Params.iMaxElitism=MAX_ELITISM;
     GA_Params.iMaxMutation=MAX_MUTATION;
-    GA_Params.iTime=10000; //milliseconds
-    GA_Params.iNroIterations=100;
+    GA_Params.iTime=3000; //milliseconds
+    GA_Params.iNroIterations=3000;
+    GA_Params.iSizeOfField=12;
+    GA_Params.iNroColField=2;
+    GA_Params.iNroRowsField=2;
+  /*  GA_Params.vTypes.push_back(COMMERCIAL);
     GA_Params.vTypes.push_back(INDUSTRIAL);
-    GA_Params.vTypes.push_back(COMMERCIAL);
     GA_Params.vTypes.push_back(RESIDENTIAL);
-
+    GA_Params.vTypes.push_back(RESIDENTIAL);
+    GA_Params.iSizeOfGene=GA_Params.vTypes.size();*/
+    // Load parameters from the File
     readMap(GA_Params);
 
-
-    // //Fitness testing
-    // struct individual Individual;
-    // Individual.gene.push_back(16);
-    // Individual.gene.push_back(1);
-    // Individual.gene.push_back(18);
-    // Individual.gene.push_back(8);
-    // Individual.gene.push_back(12);
-    //
-    // //for(int i = 0;i<100;i++){
-    // cout<<"Fitness: "<<fitnessFnc(GA_Params,Individual)<< '\n';
-    // //}
-
-
-    //Init the first generation of population
+    // Init the first generation of population
     if(initPopulation(GA_Params, vPopulation)!=SUCCESS)
     {
         cout<<"Error! A new population cannot be generated!"<<endl;
         _Exit(EXIT_FAILURE);
     }
-    long iTime=0;
 
+    long iTime=0;
+/*
+    struct individual xx;
+    xx.gene.push_back(1);
+    xx.gene.push_back(3);
+    xx.gene.push_back(1);
+    cout<<fitnessFnc1(GA_Params,xx);
+
+    vPopulation.push_back(xx);
+    vPopulation[0].gene[0]=1;
+    vPopulation[0].gene[1]=1;
+    vPopulation[0].gene[2]=0;
+    int a=isAnIndividualValid(GA_Params,xx);
+    cout<<"Valid:"<<a<<endl;
+    _Exit(EXIT_FAILURE);*/
+    iBestFitnessValue.fitness=-1000;
+    cout<<endl<<"Calculating the best configuration. Please wait!"<<endl;
     while(iter<GA_Params.iNroIterations&&iTime<GA_Params.iTime){
     //while(iter<30){
         // Iterate with the next generations
         iGoalReached=evolvePopulation(GA_Params, vPopulation);
+        if(iGoalReached.fitness>iBestFitnessValue.fitness)
+            iBestFitnessValue=iGoalReached;
         finalPopulation.push_back(iGoalReached);
         //cout<<"["<<iGoalReached.gene[0]<<" "<<iGoalReached.gene[1]<<" "<<iGoalReached.gene[2]<<"] Fitness: "<<iGoalReached.fitness<<endl;
         auto tEnd= std::chrono::steady_clock::now();
         iTime=std::chrono::duration_cast<std::chrono::milliseconds>(tEnd-tStart).count();
         iter++;
+        if(iter%20==0)
+            cout<<".";
     }
 
+
     /* Show information of the process */
-    cout<<"Simulation finished after "<<iTime<<" ms **********************************"<<endl;
+    cout<<endl<<"Simulation finished after "<<iTime<<" ms **********************************"<<endl;
     cout<<endl<<"S T A T I S T I C S   O F   T H E   S I M U L A T I O N:"<<endl<<endl;
     cout<<"  Algorithm: Genetic Algorithm"<<endl;
     cout<<"  Selection Method: TOURNAMENT"<<endl;
@@ -326,85 +321,24 @@ int genetic(int argc,char* argv[]){
     cout<<"  Population:"<<GA_Params.iSizeOfPopulation<<endl;
     cout<<"  %Elitism: "<<GA_Params.iMaxElitism<<"% \t %Mutations: "<<GA_Params.iMaxMutation*90/100<<"%";
     cout<<"\t%Crossover:"<<100-GA_Params.iMaxElitism-GA_Params.iMaxMutation*90/100<<"%"<<endl;
+    cout<<endl;
+    cout<<"  Size of Map: "<<GA_Params.iNroRowsField<<" Rows x "<<GA_Params.iNroColField<<" Columns"<<endl;
+    cout<<"  Number of buildings: "<<GA_Params.iSizeOfGene<<endl;
     cout<<"  Max_Iterations: "<<GA_Params.iNroIterations<<"\tIterations:"<<iter--<<endl;
-    cout << '\n';
-    updateMap(iGoalReached,GA_Params);
-    finalPrint(GA_Params);;
-    cout<<"  Score: "<<iGoalReached.fitness<<endl;
-    cout << '\n';
-    cout<<endl<<"Exiting of the simulation..."<<endl;
+    cout<<"  Best Fitness value: "<<iBestFitnessValue.fitness<<endl;
+    cout<<endl<<endl;
     saveCSV_File(finalPopulation);
 
+    cout<<endl<<"Exiting of the simulation..."<<endl;
 
     return 1;
-}
-
-
-int updateMap(struct individual Individual, struct Params &params){
-
-  int possition= 0;
-
-  for(int i=0;i< params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = INDUSTRIAL;
-  }
-
-  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = COMMERCIAL;
-  }
-
-  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = RESIDENTIAL;
-  }
-  return 1;
-}
-
-int cleanMap(struct individual Individual, struct Params &params){
-
-  int possition= 0;
-
-  for(int i=0;i< params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = params.InitialMap[possition];
-  }
-
-  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = params.InitialMap[possition];
-  }
-
-  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = params.InitialMap[possition];
-  }
-  return 1;
 }
 
 int isAnIndividualValid(struct Params GA_Params, struct individual nIndividual){
     vector<int> Pos;
     int iValue=0;
     int iSum=0;
-    for(int i=0;i<(int)nIndividual.gene.size();i++) {
+    for(int i=0;i<nIndividual.gene.size();i++) {
         iSum = iSum + nIndividual.gene[i];
         iValue = iSum % GA_Params.iSizeOfField;
         //cout<<iSum<<" "<<iValue<<endl;
@@ -413,7 +347,7 @@ int isAnIndividualValid(struct Params GA_Params, struct individual nIndividual){
             return FAILURE;
 
         if (Pos.size() != 0) {     //Check if a building is not over another building
-            for (int j = 0; j <(int) Pos.size(); j++) {
+            for (int j = 0; j < Pos.size(); j++) {
                 //cout<<GA_Params.Map[iValue]<<" "<<endl;
                 if (Pos[j] == iValue) {
                     //cout << "Invalid individual: [" << nIndividual.gene[0] << " " << nIndividual.gene[1] << " "
