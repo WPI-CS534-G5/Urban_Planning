@@ -14,11 +14,23 @@ int readMap(struct Params &params){
       getline (myfile,line);
       params.iNroIndustrialPlaces = line.at(0) - '0';
 
+      for(int i=0;i<params.iNroIndustrialPlaces;i++){
+        params.vTypes.push_back(INDUSTRIAL);
+      }
+
       getline (myfile,line);
       params.iNroComercialPlaces = line.at(0) - '0';
 
+      for(int i=0;i<params.iNroComercialPlaces;i++){
+        params.vTypes.push_back(COMMERCIAL);
+      }
+
       getline (myfile,line);
       params.iNroResidencialPlaces = line.at(0) - '0';
+
+      for(int i=0;i<params.iNroResidencialPlaces;i++){
+        params.vTypes.push_back(RESIDENTIAL);
+      }
 
       params.iSizeOfGene= params.iNroIndustrialPlaces+ params.iNroComercialPlaces+params.iNroResidencialPlaces;
 
@@ -78,6 +90,7 @@ int finalPrint(struct Params &params){
   int rows = params.iNroRowsField;
   int columns = params.iNroColField;
   cout << "--------- Resulting Map ---------" << '\n';
+  cout << '\n';
   cout << "  ";
   for(int i=0;i<rows*columns;i++){
       cout << convertNumToChar(params.Map[i])<<"|";
@@ -113,6 +126,66 @@ char convertNumToChar(int num){
       break;
   }
   return character;
+}
+
+int updateMap(struct individual Individual, struct Params &params){
+
+  int possition= 0;
+
+  for(int i=0;i< params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = INDUSTRIAL;
+  }
+
+  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = COMMERCIAL;
+  }
+
+  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = RESIDENTIAL;
+  }
+  return 1;
+}
+
+int cleanMap(struct individual Individual, struct Params &params){
+
+  int possition= 0;
+
+  for(int i=0;i< params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = params.InitialMap[possition];
+  }
+
+  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = params.InitialMap[possition];
+  }
+
+  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = params.InitialMap[possition];
+  }
+  return 1;
 }
 
 

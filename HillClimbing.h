@@ -1,6 +1,10 @@
 #ifndef HILLCLIMBING_H
 #define HILLCLIMBING_H
-#include "genetic.h"
+
+#include "global.h"
+#include "fitness.h"
+#include "iofunctions.h"
+
 
 // Main function for HillClimbing
 int HillClimbing(int argc,char* argv[]);
@@ -10,6 +14,8 @@ int HillClimbing(int argc,char* argv[]);
  *  Output: SUCCESS OR FAILURE */
 int evalFitness(int Map,struct individual evalIndividual,vector<struct individual> &);
 
+int getASeed(struct Params, struct individual &);
+struct individual getNewPos(struct Params,struct individual seed, int);
 
 
 #endif //URBAN_PLANNING_HILLCLIMBING_H

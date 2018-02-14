@@ -1,9 +1,21 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
+
+#include <random>
+#include <chrono>
+#include <algorithm>
+#include <cmath>
+#include <iostream>
 #include <vector>
+#include <fstream>
 #include <string>
+
+using std::endl;
+using std::cout;
+using std::terminate;
 using std::vector;
 using std::string;
+using namespace std;
 
 // ----- Global Definitions ----- //
 
