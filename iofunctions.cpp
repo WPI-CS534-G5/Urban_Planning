@@ -56,7 +56,7 @@ int readMap(struct Params &params){
     myfile.close();
   }else{
     cout << "Unable to open file"<< '\n';
-    return 0;
+    _Exit(EXIT_FAILURE);
   }
 
   for(int i=0;i<rows;i++){
@@ -185,6 +185,11 @@ int cleanMap(struct individual Individual, struct Params &params){
     }
     params.Map[possition] = params.InitialMap[possition];
   }
+  return 1;
+}
+
+int helpPrint(){
+  cout << "HELP" << '\n';
   return 1;
 }
 

@@ -3,40 +3,37 @@
 
 int costBuild(struct Params GA_Params,int i){
   int score=0;
-  if(GA_Params.InitialMap[i]<10){
-    score -= GA_Params.InitialMap[i];
+  if((GA_Params.Map[i]<10) && (GA_Params.Map[i]>=0)){
+    score -= GA_Params.Map[i];
   }
+
+  //cout << GA_Params.Map[i]<< '\n';
   return score;
 }
 
 int fitBuild(struct Params GA_Params, struct individual Individual, int i,int building, int distance, int points){
   int score=0;
   int possition = 0;
+  int sum =0;
   for(int j=0;j< GA_Params.iNroIndustrialPlaces; j++){
-    possition += Individual.gene[j];
-    if(possition> GA_Params.iNroRowsField*GA_Params.iNroColField){
-      possition -= GA_Params.iNroRowsField*GA_Params.iNroColField;
-    }
+    sum += Individual.gene[j];
+    possition = sum%GA_Params.iSizeOfField;
     if((i!=possition)&&(GA_Params.vTypes[j]==building)&&(manhatanDistance(i,possition,GA_Params)<distance+1)){
       score += points;
     }
   }
 
   for(int j= GA_Params.iNroIndustrialPlaces;j< GA_Params.iNroComercialPlaces + GA_Params.iNroIndustrialPlaces; j++){
-    possition += Individual.gene[j];
-    if(possition> GA_Params.iNroRowsField*GA_Params.iNroColField){
-      possition -= GA_Params.iNroRowsField*GA_Params.iNroColField;
-    }
+    sum += Individual.gene[j];
+    possition = sum%GA_Params.iSizeOfField;
     if((i!=possition)&&(GA_Params.vTypes[j]==building)&&(manhatanDistance(i,possition,GA_Params)<distance+1)){
       score += points;
     }
   }
 
   for(int j=GA_Params.iNroComercialPlaces+GA_Params.iNroIndustrialPlaces;j< GA_Params.iNroResidencialPlaces+ GA_Params.iNroComercialPlaces+GA_Params.iNroIndustrialPlaces; j++){
-    possition += Individual.gene[j];
-    if(possition> GA_Params.iNroRowsField*GA_Params.iNroColField){
-      possition -= GA_Params.iNroRowsField*GA_Params.iNroColField;
-    }
+    sum += Individual.gene[j];
+    possition = sum%GA_Params.iSizeOfField;
     if((i!=possition)&&(GA_Params.vTypes[j]==building)&&(manhatanDistance(i,possition,GA_Params)<distance+1)){
       score += points;
     }
@@ -66,13 +63,12 @@ int fitnessFnc(struct Params GA_Params, struct individual Individual) {
 
   int fitness =0;
   int possition= 0;
+  int sum =0;
 
   // Industrial buildings
   for(int i=0;i< GA_Params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> GA_Params.iNroRowsField*GA_Params.iNroColField){
-      possition -= GA_Params.iNroRowsField*GA_Params.iNroColField;
-    }
+    sum += Individual.gene[i];
+    possition = sum%GA_Params.iSizeOfField;
 
     //Dificulty of building
     fitness += costBuild(GA_Params,possition);
@@ -84,10 +80,8 @@ int fitnessFnc(struct Params GA_Params, struct individual Individual) {
   }
   // Commercial buildings
   for(int i= GA_Params.iNroIndustrialPlaces;i< GA_Params.iNroComercialPlaces + GA_Params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> GA_Params.iNroRowsField*GA_Params.iNroColField){
-      possition -= GA_Params.iNroRowsField*GA_Params.iNroColField;
-    }
+    sum += Individual.gene[i];
+    possition = sum%GA_Params.iSizeOfField;
 
     //Dificulty of building
     fitness += costBuild(GA_Params,possition);
@@ -102,10 +96,8 @@ int fitnessFnc(struct Params GA_Params, struct individual Individual) {
   }
   // Residential buildings
   for(int i=GA_Params.iNroComercialPlaces+GA_Params.iNroIndustrialPlaces;i< GA_Params.iNroResidencialPlaces+ GA_Params.iNroComercialPlaces+GA_Params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> GA_Params.iNroRowsField*GA_Params.iNroColField){
-      possition -= GA_Params.iNroRowsField*GA_Params.iNroColField;
-    }
+    sum += Individual.gene[i];
+    possition = sum%GA_Params.iSizeOfField;
 
     //Dificulty of building
     fitness += costBuild(GA_Params,possition);

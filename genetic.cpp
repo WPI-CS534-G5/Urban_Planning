@@ -165,13 +165,13 @@ int genetic(int argc,char* argv[]){
 
     //Init the parameters of the Genetic Algorithm.
     GA_Params.file = argv[1];  //
-    GA_Params.iSizeOfPopulation=20;
+    GA_Params.iSizeOfPopulation=200;
     GA_Params.iMethodSelection=TOURNAMENT;
     GA_Params.iMethodCrossover=RANDOM;
     GA_Params.iMaxElitism=MAX_ELITISM;
     GA_Params.iMaxMutation=MAX_MUTATION;
-    GA_Params.iTime=3000; //milliseconds
-    GA_Params.iNroIterations=3000;
+    GA_Params.iTime=10000; //milliseconds
+    GA_Params.iNroIterations=10000;
 
 
     // Load parameters from the File

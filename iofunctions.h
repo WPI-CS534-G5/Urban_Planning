@@ -12,4 +12,6 @@ char convertNumToChar(int num);
 int saveCSV_File(vector<struct individual>);
 int updateMap(struct individual Individual, struct Params &params);
 int cleanMap(struct individual Individual, struct Params &params);
+int helpPrint();
+
 #endif  //IOFUNCTIONS.H

@@ -11,8 +11,8 @@ int HillClimbing(int argc,char* argv[]){
     /* Initializa parameters */
     HC_Params.file = argv[1];  //
     HC_Params.iSizeOfPopulation=1;
-    HC_Params.iTime=1000; //milliseconds
-    HC_Params.iNroIterations=500;
+    HC_Params.iTime=10000; //milliseconds
+    HC_Params.iNroIterations=10000;
 
     /* Read the file for parameters */
     readMap(HC_Params);
