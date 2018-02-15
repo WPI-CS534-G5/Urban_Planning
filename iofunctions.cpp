@@ -14,11 +14,23 @@ int readMap(struct Params &params){
       getline (myfile,line);
       params.iNroIndustrialPlaces = line.at(0) - '0';
 
+      for(int i=0;i<params.iNroIndustrialPlaces;i++){
+        params.vTypes.push_back(INDUSTRIAL);
+      }
+
       getline (myfile,line);
       params.iNroComercialPlaces = line.at(0) - '0';
 
+      for(int i=0;i<params.iNroComercialPlaces;i++){
+        params.vTypes.push_back(COMMERCIAL);
+      }
+
       getline (myfile,line);
       params.iNroResidencialPlaces = line.at(0) - '0';
+
+      for(int i=0;i<params.iNroResidencialPlaces;i++){
+        params.vTypes.push_back(RESIDENTIAL);
+      }
 
       params.iSizeOfGene= params.iNroIndustrialPlaces+ params.iNroComercialPlaces+params.iNroResidencialPlaces;
 
@@ -50,6 +62,7 @@ int readMap(struct Params &params){
   for(int i=0;i<rows;i++){
     for(int j=0;j<columns;j++){
       params.Map.push_back(Map[i][j]);
+        //cout<<"Map: "<<Map[i][j]<<endl;
       params.InitialMap.push_back(Map[i][j]);
     }
   }
@@ -78,15 +91,33 @@ int finalPrint(struct Params &params){
   int rows = params.iNroRowsField;
   int columns = params.iNroColField;
   cout << "--------- Resulting Map ---------" << '\n';
-  cout << "  ";
-  for(int i=0;i<rows*columns;i++){
+  cout << '\n';
+
+    for(int i=0;i<columns;i++){
+        for(int j=0;j<rows;j++){
+            if(params.Map[j+i*columns]>9)
+                cout<<convertNumToChar(params.Map[j+i*columns])<<" ";
+            else {
+                //if(params.Map[i]>=0&&params.Map[i]<=9)
+                cout << char(177) <<" ";
+            }
+        }
+        cout<<endl;
+
+    }
+    cout<<endl;
+ /*
+    cout << char(176)<<char(176);
+
+
+    for(int i=0;i<rows*columns;i++){
       cout << convertNumToChar(params.Map[i])<<"|";
       if (((i+1)%columns == 0)&&(i!=0)){
         cout << '\n';
-        cout << "  ";
+        cout << char(176)<<char(176);
       }
   }
-  cout << '\n';
+  cout << '\n';*/
   return 1;
 }
 
@@ -108,11 +139,68 @@ char convertNumToChar(int num){
     case 14:
       character = 'S';
       break;
-    default:
-      character = ' ';
-      break;
   }
   return character;
+}
+
+int updateMap(struct individual Individual, struct Params &params){
+
+  int possition= 0;
+
+  for(int i=0;i< params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = INDUSTRIAL;
+  }
+
+  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = COMMERCIAL;
+  }
+
+  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = RESIDENTIAL;
+  }
+  return 1;
+}
+
+int cleanMap(struct individual Individual, struct Params &params){
+
+  int possition= 0;
+
+  for(int i=0;i< params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = params.InitialMap[possition];
+  }
+
+  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = params.InitialMap[possition];
+  }
+
+  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
+    possition += Individual.gene[i];
+    if(possition> params.iNroRowsField*params.iNroColField){
+      possition -= params.iNroRowsField*params.iNroColField;
+    }
+    params.Map[possition] = params.InitialMap[possition];
+  }
+  return 1;
 }
 
 
@@ -126,7 +214,8 @@ int saveCSV_File(vector<struct individual> Data){
     }
     outputFile.flush();
     outputFile.close();
-    cout<<"fitness.txt Generated!: Log of fitness"<<endl;
+    cout<<"Files generated:"<<endl;
+    cout<<"fitness.txt: Log of fitness"<<endl;
 
     outputFile.open("behavior.txt");
 
@@ -139,6 +228,6 @@ int saveCSV_File(vector<struct individual> Data){
     }
     outputFile.flush();
     outputFile.close();
-    cout<<"behavior.txt Generated!: Log of iterations"<<endl;
+    cout<<"behavior.txt: Log of iterations"<<endl;
     return 1;
 }
