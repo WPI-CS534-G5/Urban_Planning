@@ -88,18 +88,24 @@ int printMap(struct Params &params){
 
 int finalPrint(struct Params &params){
   int rows = params.iNroRowsField;
-  int columns = params.iNroColField;
-  cout << "--------- Resulting Map ---------" << '\n';
-  cout << '\n';
-  cout << "  ";
-  for(int i=0;i<rows*columns;i++){
-      cout << convertNumToChar(params.Map[i])<<"|";
-      if (((i+1)%columns == 0)&&(i!=0)){
-        cout << '\n';
-        cout << "  ";
+int columns = params.iNroColField;
+cout << "--------- Resulting Map ---------" << '\n';
+cout << '\n';
+
+  for(int i=0;i<columns;i++){
+    cout << "  " ;
+      for(int j=0;j<rows;j++){
+          if(params.Map[j+i*columns]>9)
+              cout<<convertNumToChar(params.Map[j+i*columns])<<" ";
+          else {
+              //if(params.Map[i]>=0&&params.Map[i]<=9)
+              cout << char(46) <<" ";
+          }
       }
+      cout<<endl;
+
   }
-  cout << '\n';
+  cout<<endl;
   return 1;
 }
 
@@ -121,75 +127,52 @@ char convertNumToChar(int num){
     case 14:
       character = 'S';
       break;
-    default:
-      character = ' ';
-      break;
   }
   return character;
 }
 
 int updateMap(struct individual Individual, struct Params &params){
 
+  int sum = 0;
   int possition= 0;
 
   for(int i=0;i< params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
+    sum += Individual.gene[i];
+    possition = sum%params.iSizeOfField;
     params.Map[possition] = INDUSTRIAL;
   }
 
   for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
+    sum += Individual.gene[i];
+    possition = sum%params.iSizeOfField;
     params.Map[possition] = COMMERCIAL;
   }
 
   for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
+    sum += Individual.gene[i];
+    possition = sum%params.iSizeOfField;
     params.Map[possition] = RESIDENTIAL;
   }
   return 1;
 }
 
-int cleanMap(struct individual Individual, struct Params &params){
-
-  int possition= 0;
-
-  for(int i=0;i< params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = params.InitialMap[possition];
-  }
-
-  for(int i= params.iNroIndustrialPlaces;i< params.iNroComercialPlaces + params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = params.InitialMap[possition];
-  }
-
-  for(int i=params.iNroComercialPlaces+params.iNroIndustrialPlaces;i< params.iNroResidencialPlaces+ params.iNroComercialPlaces+params.iNroIndustrialPlaces; i++){
-    possition += Individual.gene[i];
-    if(possition> params.iNroRowsField*params.iNroColField){
-      possition -= params.iNroRowsField*params.iNroColField;
-    }
-    params.Map[possition] = params.InitialMap[possition];
-  }
-  return 1;
-}
 
 int helpPrint(){
-  cout << "HELP" << '\n';
+
+  cout<<endl;
+  cout <<"----- ERROR -----"<<endl;
+  cout<<endl;
+  cout <<"----- FOLLOW THE EXAMPLES -----"<<endl;
+  cout<<endl;
+  cout <<"Example Input for genetic algorithm:"<<endl;
+  cout<<endl;
+  cout <<"linux> ./urbanplanning example.txt GA"<<endl;
+  cout<<endl;
+  cout <<"Example Input for Hill Climbing algorithm:"<<endl;
+  cout<<endl;
+  cout <<"linux> ./urbanplanning example.txt HC"<<endl;
+  cout<<endl;
+
   return 1;
 }
 

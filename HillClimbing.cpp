@@ -27,14 +27,14 @@ int HillClimbing(int argc,char* argv[]){
      int restart=0;
 
     long iTime=0;
-    cout<<endl<<"Calculating the best configuration. Please wait!"<<endl;
+    cout<<endl<<"Calculating the best configuration. Please wait ";
     iBestValue.fitness=-1000;
      do {
          //showGene(seed);
          iNewPos = getNewPos(HC_Params, seed, nroGen);
          //showGene(iNewPos);
          nroGen++;
-         if(nroGen>HC_Params.iSizeOfGene)
+         if(nroGen>=HC_Params.iSizeOfGene)
              nroGen=0;
 
          if(iNewPos.fitness>seed.fitness){
@@ -51,10 +51,10 @@ int HillClimbing(int argc,char* argv[]){
          auto tEnd= std::chrono::steady_clock::now();
          iTime=std::chrono::duration_cast<std::chrono::milliseconds>(tEnd-tStart).count();
          if(iter%20==0)
-             cout<<".";
+             cout<<"."<<flush;
      }while(iter<HC_Params.iNroIterations&&iTime<HC_Params.iTime);
 
-
+    cout<<endl;
 /* Show information of the process */
     cout<<endl<<"Simulation finished after "<<iTime<<" ms **********************************"<<endl;
     cout<<endl<<"S T A T I S T I C S   O F   T H E   S I M U L A T I O N:"<<endl<<endl;
@@ -64,7 +64,6 @@ int HillClimbing(int argc,char* argv[]){
     // cout<<"  Size of Map: "<<HC_Params.iNroRowsField<<" Rows x "<<HC_Params.iNroColField<<" Columns"<<endl;
     // cout<<"  Number of buildings: "<<HC_Params.iSizeOfGene<<endl;
     cout<<"  Max_Iterations: "<<HC_Params.iNroIterations<<"\tIterations:"<<iter--<<endl;
-    cout<<"  Best Fitness value: "<<iBestValue.fitness<<endl;
 
     cout << '\n';
     updateMap(iBestValue,HC_Params);

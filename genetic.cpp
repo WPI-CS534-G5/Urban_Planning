@@ -164,39 +164,16 @@ int genetic(int argc,char* argv[]){
 
 
     //Init the parameters of the Genetic Algorithm.
-    GA_Params.file = argv[1];  //
-    GA_Params.iSizeOfPopulation=200;
+    GA_Params.file = argv[1];
+    // Load parameters from the File
+    readMap(GA_Params);
+    GA_Params.iSizeOfPopulation=2*GA_Params.iSizeOfField;
     GA_Params.iMethodSelection=TOURNAMENT;
     GA_Params.iMethodCrossover=RANDOM;
     GA_Params.iMaxElitism=MAX_ELITISM;
     GA_Params.iMaxMutation=MAX_MUTATION;
     GA_Params.iTime=10000; //milliseconds
     GA_Params.iNroIterations=10000;
-
-
-    // Load parameters from the File
-    readMap(GA_Params);
-
-
-
-    // //Fitness testing
-    // struct individual Individual;
-    // Individual.gene.push_back(1);
-    // Individual.gene.push_back(15);
-    // Individual.gene.push_back(48);
-    // Individual.gene.push_back(19);
-    // Individual.gene.push_back(50);
-    // Individual.gene.push_back(18);
-    // Individual.gene.push_back(29);
-    // Individual.gene.push_back(25);
-    // Individual.gene.push_back(38);
-    //
-    // updateMap(Individual,GA_Params);
-    // finalPrint(GA_Params);
-    // //for(int i = 0;i<100;i++){
-    // cout<<"Fitness: "<<fitnessFnc(GA_Params,Individual)<< '\n';
-    // //}
-
 
 
     // Init the first generation of population
@@ -248,6 +225,9 @@ int genetic(int argc,char* argv[]){
     finalPrint(GA_Params);
     cout<<"  Score: "<<iBestFitnessValue.fitness<<endl;
     cout << '\n';
+
+    cout<<endl<<endl;
+    saveCSV_File(finalPopulation);
     cout<<endl<<"Exiting of the simulation..."<<endl;
 
 
